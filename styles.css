@@ -1,0 +1,39 @@
+body{
+  margin: 0;
+}
+html, div, input{
+  box-sizing: border-box;
+}
+
+#app{
+  width: 100vw;
+  float: left;
+}
+
+#search{
+  width: 250px;
+  float: left;
+  height: 100vh;
+  background: #FAFAFA;
+  padding: 10px;
+}
+
+#results{
+  width: calc(100% - 250px);
+  float: right;
+  height: 100vh;
+  background-color: #F5F5F5;
+}
+#results ul{
+  width: 100%;
+  float: left;
+  flex-wrap: wrap;
+}
+#results ul li{
+  width: 20%;
+  float: left;
+}
+#results ul li img{
+  width: 100%;
+  float: left;
+}
