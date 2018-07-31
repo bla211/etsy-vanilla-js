@@ -17,42 +17,22 @@ handleData = (data) => {
 };
 
 etsy.search = (type) => {
+  if(type === 'click' || type === 'load'){
+      etsy.clearSearchResults();
+      etsy.showLoadingAnimation();
+  }
   document.getElementById('load_next').style.opacity = 0;
-  let keywordString = '';
-  let offsetString = '';
-  if(type === 'click'){
-    etsy.searchResults = [];
-    document.getElementById('results_list').innerHTML = '<img id="loading_animation" src="https://digitalsynopsis.com/wp-content/uploads/2016/06/loading-animations-preloader-gifs-ui-ux-effects-10.gif"/>';
-    etsy.keywords = document.getElementById('search_box').value;
-    keywordString = '&keywords=' + encodeURI(etsy.keywords);
-  }
-  else if(type === 'load'){
-    document.getElementById('results_list').innerHTML = '<img id="loading_animation" src="https://digitalsynopsis.com/wp-content/uploads/2016/06/loading-animations-preloader-gifs-ui-ux-effects-10.gif"/>';
-    etsy.searchResults = [];
-  }
-  else if(type === 'next'){
-      if(etsy.keywords.length){
-          keywordString = '&keywords=' + encodeURI(etsy.keywords);
-      }
-      offsetString = '&offset=' + etsy.searchResults.length;
-  }
+  etsy.keywords = document.getElementById('search_box').value;
   let script = document.createElement('script');
-  script.src = 'https://openapi.etsy.com/v2/listings/active.js?includes=MainImage&callback=handleData&api_key=' + etsy.apiKey + keywordString + offsetString + '&limit=25';
+  script.src = etsy.generateScript(type, etsy.keywords, etsy.searchResults.length);
   document.getElementsByTagName('head')[0].appendChild(script);
 };
 
 etsy.buildList = () => {
   let html = '';
-  etsy.searchResults.forEach((val, i) => {
-    if(val.MainImage){
-      html += '<li data-index="' + i + '">';
-      html += '<div class="tile_thumb" style="background-image:url(' + val.MainImage.url_fullxfull + ')"></div>';
-      html += '<div class="price">$' + val.price + '</div>'
-      html += '<div class="tile_title" onclick="etsy.loadEtsyPage(' + i + ')">';
-      html += val.title;
-      html += '<div class="view_product">View Product</div>';
-      html += '</div>';
-      html += '</li>';
+  etsy.searchResults.forEach((result, index) => {
+    if(result.MainImage){
+      html += etsy.generateResultsHTML(result, index);
     }
   });
 
@@ -121,4 +101,40 @@ etsy.loadSearch = (index) => {
 
 etsy.resultsCount = (searchResults, numberOfResults) => {
   return 'Displaying ' + searchResults.length + ' of ' + numberOfResults + ' results';
+};
+
+etsy.generateScript = (type, keywords, resultsLength) => {
+  let keywordString = '';
+  let offsetString = '';
+  if(type === 'click'){
+    keywordString = '&keywords=' + encodeURI(keywords);
+  }
+  else if(type === 'next'){
+      if(keywords.length){
+          keywordString = '&keywords=' + encodeURI(keywords);
+      }
+      offsetString = '&offset=' + resultsLength;
+  }
+  return 'https://openapi.etsy.com/v2/listings/active.js?includes=MainImage&callback=handleData&api_key=' + etsy.apiKey + keywordString + offsetString + '&limit=25';
+};
+
+etsy.showLoadingAnimation = () => {
+  document.getElementById('results_list').innerHTML = '<img id="loading_animation" src="https://josephdoughertyblog.files.wordpress.com/2014/09/loading-animation-white.gif"/>';
+};
+
+etsy.clearSearchResults = () => {
+ etsy.searchResults = [];
+};
+
+etsy.generateResultsHTML = (result, index) => {
+  let html = '';
+  html += '<li data-index="' + index + '">';
+  html += '<div class="tile_thumb" style="background-image:url(' + result.MainImage.url_fullxfull + ')"></div>';
+  html += '<div class="price">$' + result.price + '</div>'
+  html += '<div class="tile_title" onclick="etsy.loadEtsyPage(' + index + ')">';
+  html += result.title;
+  html += '<div class="view_product">View Product</div>';
+  html += '</div>';
+  html += '</li>';
+  return html;
 };
