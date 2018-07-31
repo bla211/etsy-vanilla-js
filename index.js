@@ -27,7 +27,7 @@ var etsy = (() => {
   };
 
   hideLoadingAnimation = () => {
-    document.getElementById('loading_animation').style.display = 'block';
+    document.getElementById('loading_animation').style.display = 'none';
   };
 
   generateScript = (type, keywords, resultsLength) => {
@@ -55,6 +55,7 @@ var etsy = (() => {
   };
 
   buildList = () => {
+    hideLoadingAnimation();
     let html = '';
     searchResults.forEach((result, index) => {
       if(result.MainImage){
