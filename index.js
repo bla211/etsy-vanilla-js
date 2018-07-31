@@ -1,60 +1,119 @@
 var etsy = etsy || {};
 etsy.apiKey = '2z5arsdpfe5py1mcc5welkm2';
 etsy.keywords = '';
-etsy.searchResults = {};
+etsy.searchResults = [];
+etsy.numberOfResults = null;
+etsy.savedSearches = [];
 
 //callback for jsonp
 handleData = (data) => {
   if (data.ok) {
-      data.results.forEach((val, index) => {
-          etsy.getImage(val.listing_id);
-      });
-      etsy.handleResults(data.results);
-    } else {
-        console.log(data.error);
+    etsy.numberOfResults = data.count;
+    etsy.handleResults(data.results);
+  }
+  else {
+    console.log(data.error);
   }
 };
 
-handleImage = (data) => {
-  if (data.ok) {
-    etsy.handleImageResults(data.results);
-    etsy.buildList();
-  } else {
-      console.log(data.error);
+etsy.search = (type) => {
+  document.getElementById('load_next').style.opacity = 0;
+  let keywordString = '';
+  let offsetString = '';
+  if(type === 'click'){
+    etsy.searchResults = [];
+    document.getElementById('results_list').innerHTML = '<img id="loading_animation" src="https://digitalsynopsis.com/wp-content/uploads/2016/06/loading-animations-preloader-gifs-ui-ux-effects-10.gif"/>';
+    etsy.keywords = document.getElementById('search_box').value;
+    keywordString = '&keywords=' + encodeURI(etsy.keywords);
   }
-};
-
-etsy.search = () => {
-  etsy.keywords = document.getElementById('search_box').value;
+  else if(type === 'load'){
+    document.getElementById('results_list').innerHTML = '<img id="loading_animation" src="https://digitalsynopsis.com/wp-content/uploads/2016/06/loading-animations-preloader-gifs-ui-ux-effects-10.gif"/>';
+    etsy.searchResults = [];
+  }
+  else if(type === 'next'){
+      if(etsy.keywords.length){
+          keywordString = '&keywords=' + encodeURI(etsy.keywords);
+      }
+      offsetString = '&offset=' + etsy.searchResults.length;
+  }
   let script = document.createElement('script');
-  script.src = 'https://openapi.etsy.com/v2/listings/active.js?callback=handleData&api_key=' + etsy.apiKey + '&keywords=' + encodeURI(etsy.keywords) + '&limit=10';
+  script.src = 'https://openapi.etsy.com/v2/listings/active.js?includes=MainImage&callback=handleData&api_key=' + etsy.apiKey + keywordString + offsetString + '&limit=25';
   document.getElementsByTagName('head')[0].appendChild(script);
 };
 
 etsy.buildList = () => {
   let html = '';
-  Object.keys(etsy.searchResults).forEach((key, i) => {
-    html += '<li>';
-    html += '<img src="' + etsy.searchResults[key].imageUrl + '"/>';
-    html += etsy.searchResults[key].title;
-    html += '</li>';
+  etsy.searchResults.forEach((val, i) => {
+    if(val.MainImage){
+      html += '<li data-index="' + i + '">';
+      html += '<div class="tile_thumb" style="background-image:url(' + val.MainImage.url_fullxfull + ')"></div>';
+      html += '<div class="price">$' + val.price + '</div>'
+      html += '<div class="tile_title" onclick="etsy.loadEtsyPage(' + i + ')">';
+      html += val.title;
+      html += '<div class="view_product">View Product</div>';
+      html += '</div>';
+      html += '</li>';
+    }
   });
 
-  document.getElementById('results').children[0].innerHTML = html;
-};
-
-etsy.getImage = (listingId) => {
-  let script = document.createElement('script');
-  script.src = 'https://openapi.etsy.com/v2/listings/' + parseInt(listingId) + '/images.js?callback=handleImage&api_key=' + etsy.apiKey;
-  document.getElementsByTagName('head')[0].appendChild(script);
+  document.getElementById('results_list').innerHTML = html;
+  document.getElementById('results_count').innerHTML = 'Displaying ' + Object.keys(etsy.searchResults).length + ' of ' + etsy.numberOfResults + ' results';
+  document.getElementById('load_next').style.opacity = 1;
 };
 
 etsy.handleResults = (results) => {
-  results.forEach((val, i) => {
-    etsy.searchResults[val.listing_id] = val;
+  results.forEach((val) => {
+    etsy.searchResults.push(val);
   });
+  etsy.buildList();
 };
 
-etsy.handleImageResults = (imageResults) => {
-  etsy.searchResults[imageResults[0].listing_id]['imageUrl'] = imageResults[0].url_170x135;
+etsy.handleEnterPress = () => {
+  document.getElementById('search_box').onkeydown = function(e){
+     if(e.keyCode == 13){
+       etsy.search('click');
+     }
+  };
+};
+
+etsy.loadEtsyPage = (index) => {
+  window.open(etsy.searchResults[index].url);
+};
+
+etsy.getSavedSearches = () => {
+    let savedSearches = JSON.parse(localStorage.getItem("savedSearches"));
+    etsy.savedSearches = savedSearches;
+
+    etsy.buildSavedSearchList();
+};
+
+etsy.saveSearch = () => {
+  if(etsy.keywords.length){
+    let savedSearches = JSON.parse(localStorage.getItem("savedSearches"));
+    if(savedSearches === null){
+      savedSearches = [];
+    }
+    savedSearches.push(etsy.keywords);
+    localStorage.setItem("savedSearches", JSON.stringify(savedSearches));
+
+    etsy.savedSearches = savedSearches;
+    etsy.buildSavedSearchList();
+  }
+};
+
+etsy.buildSavedSearchList = () => {
+    let html = '';
+    if(etsy.savedSearches !== null){
+      etsy.savedSearches.forEach((val, i) => {
+        html += '<li onclick="etsy.loadSearch(' + i + ')">' + val + '</li>'
+      });
+
+      document.getElementById('saved_search_list').innerHTML = html;
+    }
+};
+
+etsy.loadSearch = (index) => {
+  etsy.keywords = etsy.savedSearches[index];  
+  document.getElementById('search_box').value = etsy.keywords;
+  etsy.search('click');
 };
