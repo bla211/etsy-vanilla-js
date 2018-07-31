@@ -142,6 +142,9 @@ html{
   left: 3%;
   z-index: 100;
   color: white;
+  visibility: hidden;
+  transition: visibility 0s, opacity 0.1s linear;
+  opacity: 0;
 }
 
 .tile_title{
@@ -172,6 +175,10 @@ html{
 
 .tile_title:hover .view_product{
   font-weight: 900;
+}
+#results_list li:hover .price{
+  visibility: visible;
+  opacity: 1;
 }
 
 #results_list li:hover .tile_title{
