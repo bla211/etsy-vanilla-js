@@ -18,26 +18,9 @@ handleData = (data) => {
 
 etsy.search = (type) => {
   document.getElementById('load_next').style.opacity = 0;
-  let keywordString = '';
-  let offsetString = '';
-  if(type === 'click'){
-    etsy.searchResults = [];
-    document.getElementById('results_list').innerHTML = '<img id="loading_animation" src="https://josephdoughertyblog.files.wordpress.com/2014/09/loading-animation-white.gif"/>';
-    etsy.keywords = document.getElementById('search_box').value;
-    keywordString = '&keywords=' + encodeURI(etsy.keywords);
-  }
-  else if(type === 'load'){
-    document.getElementById('results_list').innerHTML = '<img id="loading_animation" src="https://josephdoughertyblog.files.wordpress.com/2014/09/loading-animation-white.gif"/>';
-    etsy.searchResults = [];
-  }
-  else if(type === 'next'){
-      if(etsy.keywords.length){
-          keywordString = '&keywords=' + encodeURI(etsy.keywords);
-      }
-      offsetString = '&offset=' + etsy.searchResults.length;
-  }
+  etsy.keywords = document.getElementById('search_box').value;
   let script = document.createElement('script');
-  script.src = 'https://openapi.etsy.com/v2/listings/active.js?includes=MainImage&callback=handleData&api_key=' + etsy.apiKey + keywordString + offsetString + '&limit=25';
+  script.src = etsy.generateScript(type, etsy.keywords);
   document.getElementsByTagName('head')[0].appendChild(script);
 };
 
@@ -121,4 +104,34 @@ etsy.loadSearch = (index) => {
 
 etsy.resultsCount = (searchResults, numberOfResults) => {
   return 'Displaying ' + searchResults.length + ' of ' + numberOfResults + ' results';
+};
+
+etsy.generateScript = (type, keywords, script) => {
+  let keywordString = '';
+  let offsetString = '';
+  if(type === 'click'){
+    etsy.clearSearchResults();
+    etsy.showLoadingAnimation();
+    keywordString = '&keywords=' + encodeURI(etsy.keywords);
+  }
+  else if(type === 'load'){
+    etsy.clearSearchResults();
+    etsy.showLoadingAnimation();
+    keywordString = '';
+  }
+  else if(type === 'next'){
+      if(keywords.length){
+          keywordString = '&keywords=' + encodeURI(etsy.keywords);
+      }
+      offsetString = '&offset=' + etsy.searchResults.length;
+  }
+  return 'https://openapi.etsy.com/v2/listings/active.js?includes=MainImage&callback=handleData&api_key=' + etsy.apiKey + keywordString + offsetString + '&limit=25';
+};
+
+etsy.showLoadingAnimation = () => {
+  document.getElementById('results_list').innerHTML = '<img id="loading_animation" src="https://josephdoughertyblog.files.wordpress.com/2014/09/loading-animation-white.gif"/>';
+};
+
+etsy.clearSearchResults = () => {
+ etsy.searchResults = [];
 };
