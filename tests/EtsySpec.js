@@ -12,4 +12,19 @@ describe("Script generator", function() {
     const url = 'https://openapi.etsy.com/v2/listings/active.js?includes=MainImage&callback=handleData&api_key=2z5arsdpfe5py1mcc5welkm2&keywords=test%20etsy&limit=25';
     expect(etsy.generateScript(type, keywords)).toEqual(url);
   });
+
+  it("generates script src for loading next 25 results", function() {
+    const type = 'next';
+    const keywords = 'test etsy';
+    const resultsLength = 25;
+    const url = 'https://openapi.etsy.com/v2/listings/active.js?includes=MainImage&callback=handleData&api_key=2z5arsdpfe5py1mcc5welkm2&keywords=test%20etsy&offset=25&limit=25';
+    expect(etsy.generateScript(type, keywords, resultsLength)).toEqual(url);
+  });
+
+  it("generates script src for loading page load results", function() {
+    const type = 'load';
+    const keywords = '';
+    const url = 'https://openapi.etsy.com/v2/listings/active.js?includes=MainImage&callback=handleData&api_key=2z5arsdpfe5py1mcc5welkm2&limit=25';
+    expect(etsy.generateScript(type, keywords)).toEqual(url);
+  });
 });

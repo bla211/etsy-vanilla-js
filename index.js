@@ -24,7 +24,7 @@ etsy.search = (type) => {
   document.getElementById('load_next').style.opacity = 0;
   etsy.keywords = document.getElementById('search_box').value;
   let script = document.createElement('script');
-  script.src = etsy.generateScript(type, etsy.keywords);
+  script.src = etsy.generateScript(type, etsy.keywords, etsy.searchResults.length);
   document.getElementsByTagName('head')[0].appendChild(script);
 };
 
@@ -110,7 +110,7 @@ etsy.resultsCount = (searchResults, numberOfResults) => {
   return 'Displaying ' + searchResults.length + ' of ' + numberOfResults + ' results';
 };
 
-etsy.generateScript = (type, keywords) => {
+etsy.generateScript = (type, keywords, resultsLength) => {
   let keywordString = '';
   let offsetString = '';
   if(type === 'click'){
@@ -120,7 +120,7 @@ etsy.generateScript = (type, keywords) => {
       if(keywords.length){
           keywordString = '&keywords=' + encodeURI(keywords);
       }
-      offsetString = '&offset=' + etsy.searchResults.length;
+      offsetString = '&offset=' + resultsLength;
   }
   return 'https://openapi.etsy.com/v2/listings/active.js?includes=MainImage&callback=handleData&api_key=' + etsy.apiKey + keywordString + offsetString + '&limit=25';
 };
