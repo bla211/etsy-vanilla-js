@@ -30,16 +30,9 @@ etsy.search = (type) => {
 
 etsy.buildList = () => {
   let html = '';
-  etsy.searchResults.forEach((val, i) => {
-    if(val.MainImage){
-      html += '<li data-index="' + i + '">';
-      html += '<div class="tile_thumb" style="background-image:url(' + val.MainImage.url_fullxfull + ')"></div>';
-      html += '<div class="price">$' + val.price + '</div>'
-      html += '<div class="tile_title" onclick="etsy.loadEtsyPage(' + i + ')">';
-      html += val.title;
-      html += '<div class="view_product">View Product</div>';
-      html += '</div>';
-      html += '</li>';
+  etsy.searchResults.forEach((result, index) => {
+    if(result.MainImage){
+      html += etsy.generateResultsHTML(result, index);
     }
   });
 
@@ -131,4 +124,17 @@ etsy.showLoadingAnimation = () => {
 
 etsy.clearSearchResults = () => {
  etsy.searchResults = [];
+};
+
+etsy.generateResultsHTML = (result, index) => {
+  let html = '';
+  html += '<li data-index="' + index + '">';
+  html += '<div class="tile_thumb" style="background-image:url(' + result.MainImage.url_fullxfull + ')"></div>';
+  html += '<div class="price">$' + result.price + '</div>'
+  html += '<div class="tile_title" onclick="etsy.loadEtsyPage(' + index + ')">';
+  html += result.title;
+  html += '<div class="view_product">View Product</div>';
+  html += '</div>';
+  html += '</li>';
+  return html;
 };
