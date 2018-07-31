@@ -1,9 +1,6 @@
-describe("A suite is just a function", function() {
-  var a;
-
-  it("and so is a spec", function() {
-    a = true;
-
-    expect(a).toBe(true);
+describe("Results count", function() {
+  it("shows number of results shown out of total results", function() {
+    const searchResults = [1,2,3,4,5,6,7]
+    expect(etsy.resultsCount(searchResults, 1000)).toEqual('Displaying 7 of 1000 results');
   });
 });

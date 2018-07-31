@@ -57,7 +57,7 @@ etsy.buildList = () => {
   });
 
   document.getElementById('results_list').innerHTML = html;
-  document.getElementById('results_count').innerHTML = 'Displaying ' + Object.keys(etsy.searchResults).length + ' of ' + etsy.numberOfResults + ' results';
+  document.getElementById('results_count').innerHTML = etsy.resultsCount(etsy.searchResults, etsy.numberOfResults);
   document.getElementById('load_next').style.opacity = 1;
 };
 
@@ -113,7 +113,11 @@ etsy.buildSavedSearchList = () => {
 };
 
 etsy.loadSearch = (index) => {
-  etsy.keywords = etsy.savedSearches[index];  
+  etsy.keywords = etsy.savedSearches[index];
   document.getElementById('search_box').value = etsy.keywords;
   etsy.search('click');
+};
+
+etsy.resultsCount = (searchResults, numberOfResults) => {
+  return 'Displaying ' + searchResults.length + ' of ' + numberOfResults + ' results';
 };
