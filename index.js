@@ -88,6 +88,7 @@ etsy.getSavedSearches = () => {
 };
 
 etsy.saveSearch = () => {
+  //doing this in local storage in lieu of rest api
   if(etsy.keywords.length){
     let savedSearches = JSON.parse(localStorage.getItem("savedSearches"));
     if(savedSearches === null){

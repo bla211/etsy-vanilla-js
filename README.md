@@ -8,4 +8,4 @@ index.html contains the main application it is best viewed in chrome
 
 ### testing
 
-opening tests/SpecRunner.html in chrome will run the test
+opening tests/SpecRunner.html in chrome will run the tests using jasmine
