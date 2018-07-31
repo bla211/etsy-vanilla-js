@@ -1,9 +1,9 @@
 var etsy = (() => {
   const apiKey = '2z5arsdpfe5py1mcc5welkm2';
-  let keywords = '';
-  let searchResults = [];
-  let numberOfResults = null;
-  let savedSearches = [];
+  let KEYWORDS = '';
+  let SEARCH_RESULTS = [];
+  let NUMBER_OF_RESULTS = 0;
+  let SAVED_SEARCHES = [];
 
   search = (type) => {
     if(type === 'click' || type === 'load'){
@@ -11,14 +11,16 @@ var etsy = (() => {
         showLoadingAnimation();
     }
     document.getElementById('load_next').style.opacity = 0;
-    keywords = document.getElementById('search_box').value;
+    KEYWORDS = document.getElementById('search_box').value;
     let script = document.createElement('script');
-    script.src = generateScript(type, keywords, searchResults.length);
+    script.src = generateScript(type, KEYWORDS, SEARCH_RESULTS.length);
     document.getElementsByTagName('head')[0].appendChild(script);
   };
 
   clearSearchResults = () => {
-    searchResults = [];
+    SEARCH_RESULTS = [];
+    NUMBER_OF_RESULTS = 0;
+    document.getElementById('results_count').innerHTML = resultsCount(SEARCH_RESULTS, NUMBER_OF_RESULTS);
     document.getElementById('results_list').innerHTML = '';
   }
 
@@ -31,25 +33,25 @@ var etsy = (() => {
   };
 
   generateScript = (type, keywords, resultsLength) => {
-    let keywordString = '';
+    let keywordstring = '';
     let offsetString = '';
     if(type === 'click'){
-      keywordString = '&keywords=' + encodeURI(keywords);
+      keywordstring = '&keywords=' + encodeURI(keywords);
     }
     else if(type === 'next'){
         if(keywords.length){
-            keywordString = '&keywords=' + encodeURI(keywords);
+            keywordstring = '&keywords=' + encodeURI(keywords);
         }
         offsetString = '&offset=' + resultsLength;
     }
-    return 'https://openapi.etsy.com/v2/listings/active.js?includes=MainImage&callback=handleData&api_key=' + apiKey + keywordString + offsetString + '&limit=25';
+    return 'https://openapi.etsy.com/v2/listings/active.js?includes=MainImage&callback=handleData&api_key=' + apiKey + keywordstring + offsetString + '&limit=25';
   };
 
   handleResults = (data) => {
     const results = data.results
-    numberOfResults = data.count;
+    NUMBER_OF_RESULTS = data.count;
     results.forEach((val) => {
-      searchResults.push(val);
+      SEARCH_RESULTS.push(val);
     });
     buildList();
   };
@@ -57,14 +59,14 @@ var etsy = (() => {
   buildList = () => {
     hideLoadingAnimation();
     let html = '';
-    searchResults.forEach((result, index) => {
+    SEARCH_RESULTS.forEach((result, index) => {
       if(result.MainImage){
         html += generateResultsHTML(result, index);
       }
     });
 
     document.getElementById('results_list').innerHTML = html;
-    document.getElementById('results_count').innerHTML = resultsCount(searchResults, numberOfResults);
+    document.getElementById('results_count').innerHTML = resultsCount(SEARCH_RESULTS, NUMBER_OF_RESULTS);
     document.getElementById('load_next').style.opacity = 1;
   };
 
@@ -94,20 +96,20 @@ var etsy = (() => {
   };
 
   loadEtsyPage = (index) => {
-    window.open(searchResults[index].url);
+    window.open(SEARCH_RESULTS[index].url);
   };
 
   getSavedSearches = () => {
-      let savedSearchesJSON = JSON.parse(localStorage.getItem("savedSearches"));
-      savedSearches = savedSearchesJSON;
+      let savedSearches = JSON.parse(localStorage.getItem("savedSearches"));
+      SAVED_SEARCHES = savedSearches;
 
       buildSavedSearchList();
   };
 
   buildSavedSearchList = () => {
       let html = '';
-      if(savedSearches !== null){
-        savedSearches.forEach((val, i) => {
+      if(SAVED_SEARCHES !== null){
+        SAVED_SEARCHES.forEach((val, i) => {
           html += '<li onclick="etsy.loadSearch(' + i + ')">' + val + '</li>'
         });
 
@@ -117,22 +119,22 @@ var etsy = (() => {
 
   saveSearch = () => {
     //doing this in local storage in lieu of rest api
-    if(keywords.length){
-      let savedSearchesJSON = JSON.parse(localStorage.getItem("savedSearches"));
-      if(savedSearchesJSON === null){
-        savedSearchesJSON = [];
+    if(KEYWORDS.length){
+      let savedSearches = JSON.parse(localStorage.getItem("savedSearches"));
+      if(savedSearches === null){
+        savedSearches = [];
       }
-      savedSearchesJSON.push(keywords);
-      localStorage.setItem("savedSearches", JSON.stringify(savedSearchesJSON));
+      savedSearches.push(KEYWORDS);
+      localStorage.setItem("savedSearches", JSON.stringify(savedSearches));
 
-      savedSearches = savedSearchesJSON;
+      SAVED_SEARCHES = savedSearches;
       buildSavedSearchList();
     }
   };
 
   loadSearch = (index) => {
-    keywords = savedSearches[index];
-    document.getElementById('search_box').value = keywords;
+    KEYWORDS = SAVED_SEARCHES[index];
+    document.getElementById('search_box').value = KEYWORDS;
     search('click');
   };
 
