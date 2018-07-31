@@ -18,6 +18,8 @@ I used a few global variables to hold data that I would be using across the appl
 
 I decided to not use any compilation or preprocessing for js or css to stay with the theme of vanilla development.
 
+I would like to add some more advanced search features in the future. The code should structure should allow for easily adding parameters to the query string.
+
 ## Testing Considerations
 I used a web implementation of Jasmine to unit test my code.
 
