@@ -19,7 +19,7 @@ var etsy = (() => {
 
   clearSearchResults = () => {
     searchResults = [];
-    document.getElementById('results_list').innerHTML = ''
+    document.getElementById('results_list').innerHTML = '';
   }
 
   showLoadingAnimation = () => {
