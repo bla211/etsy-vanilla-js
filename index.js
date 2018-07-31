@@ -1,5 +1,5 @@
 var etsy = (() => {
-  const apiKey = '2z5arsdpfe5py1mcc5welkm2';
+  const API_KEY = '2z5arsdpfe5py1mcc5welkm2';
   let KEYWORDS = '';
   let SEARCH_RESULTS = [];
   let NUMBER_OF_RESULTS = 0;
@@ -44,7 +44,7 @@ var etsy = (() => {
         }
         offsetString = '&offset=' + resultsLength;
     }
-    return 'https://openapi.etsy.com/v2/listings/active.js?includes=MainImage&callback=handleData&api_key=' + apiKey + keywordstring + offsetString + '&limit=25';
+    return 'https://openapi.etsy.com/v2/listings/active.js?includes=MainImage&callback=handleData&api_key=' + API_KEY + keywordstring + offsetString + '&limit=25';
   };
 
   handleResults = (data) => {
