@@ -17,6 +17,10 @@ handleData = (data) => {
 };
 
 etsy.search = (type) => {
+  if(type === 'click' || type === 'load'){
+      etsy.clearSearchResults();
+      etsy.showLoadingAnimation();
+  }
   document.getElementById('load_next').style.opacity = 0;
   etsy.keywords = document.getElementById('search_box').value;
   let script = document.createElement('script');
@@ -106,22 +110,15 @@ etsy.resultsCount = (searchResults, numberOfResults) => {
   return 'Displaying ' + searchResults.length + ' of ' + numberOfResults + ' results';
 };
 
-etsy.generateScript = (type, keywords, script) => {
+etsy.generateScript = (type, keywords) => {
   let keywordString = '';
   let offsetString = '';
   if(type === 'click'){
-    etsy.clearSearchResults();
-    etsy.showLoadingAnimation();
-    keywordString = '&keywords=' + encodeURI(etsy.keywords);
-  }
-  else if(type === 'load'){
-    etsy.clearSearchResults();
-    etsy.showLoadingAnimation();
-    keywordString = '';
+    keywordString = '&keywords=' + encodeURI(keywords);
   }
   else if(type === 'next'){
       if(keywords.length){
-          keywordString = '&keywords=' + encodeURI(etsy.keywords);
+          keywordString = '&keywords=' + encodeURI(keywords);
       }
       offsetString = '&offset=' + etsy.searchResults.length;
   }
