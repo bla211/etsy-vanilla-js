@@ -12,7 +12,7 @@ opening tests/SpecRunner.html in chrome will run the tests using jasmine
 
 
 ## Code Considerations
-I used a static name-spacing pattern for the javascript. Using this approach protects the code from naming collisions for both global variables and methods.
+I used a revealing module pattern for the javascript. Using this approach protects the code from naming collisions and protects private variables and methods. I would implement some sort of pubsub/event bus if the application required more modules and a more complex architecture.
 
 I used a few global variables to hold data that I would be using across the application. This makes sure that the data I am using is always the most up to date if a function changes a variable.
 
